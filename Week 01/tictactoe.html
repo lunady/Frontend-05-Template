@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    .gamer {
+      width: 400px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    #board {
+      display: flex;
+      flex-wrap: wrap;
+      width: 300px;
+    }
+
+    #board > div {
+      width: 33%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #000000;
+      height: 100px;
+      box-sizing: border-box;
+      font-size: 30px;
+    }
+
+    #board > div.active {
+      background-color: #e9ccff;
+      box-shadow: 0px 0px 30px #e45eff;
+      animation: fade 1s infinite linear;
+    }
+
+    #again, #ai {
+      margin: 20px 0;
+      width: 100px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      border-radius: 6px;
+      border: 1px solid #000000;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 1.0;
+      }
+      50% {
+        opacity: 0.4;
+      }
+      to {
+        opacity: 1.0;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="gamer">
+  <div id="again">重来</div>
+  <div id="ai">人机对战</div>
+  <div id="board"></div>
+  <p id="color"></p>
+</div>
+</body>
+<script>
+  let board_ele = document.getElementById("board");
+  let color_ele = document.getElementById("color");
+  let ai = false;
+  let status = 0; // 状态 0-未开始 1-结束
+  let color = 1;
+  let pattern = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+
+  function show() {
+    board_ele.innerText = ""
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        let cell = document.createElement("div");
+        // cell.innerText =
+        cell.innerText = pattern[i][j] === 1 ? `❌` : pattern[i][j] === 2 ? `⭕️` : ``
+        cell.addEventListener("click", function () {
+          if (!pattern[i][j]) move(i, j)
+        })
+        cell.id = `${i}_${j}`;
+        cell.classList.remove("active");
+        board_ele.append(cell)
+      }
+    }
+
+    if (!status) color_ele.innerText = color === 1 ? "现在是: ❌ 的回合！" : "现在是: ⭕ 的回合！️";
+  }
+
+  function move(x, y) {
+    if (status) return;
+    pattern[x][y] = color;
+    if (check(pattern, color)) {
+      console.log('win!', color)
+      let end_msg = `结束：${color === 1 ? "❌" : "⭕️"} 胜利!`
+      color_ele.innerText = end_msg;
+      alert(end_msg)
+      status = 1
+    }
+    color = 3 - color;
+    show()
+
+    if (!status) {
+      if (ai) {
+        computerMove(pattern, color)
+      } else {
+        let winPoint = willWin(pattern, color)
+        if (winPoint) {
+          console.log(`${color === 1 ? "❌" : "⭕️"} 落在 第${winPoint[0] + 1}行 第${winPoint[1] + 1}列 即将胜利！`)
+          let goal = document.getElementById(`${winPoint[0]}_${winPoint[1]}`)
+          if (goal) goal.className = "active"
+        }
+      }
+    }
+
+    // let {point, result} = bastChoice(pattern, color)
+    // console.log(point, result);
+  }
+
+  function clone(pattern) {
+    return JSON.parse(JSON.stringify(pattern))
+  }
+
+  function willWin(pattern, color) {
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (pattern[i][j]) {
+          continue;
+        }
+        let tmp = clone(pattern)
+        tmp[i][j] = color;
+        if (check(tmp, color)) {
+          return [i, j]
+        }
+      }
+    }
+    return null
+  }
+
+  function check(pattern, color) {
+    {
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[i][j] !== color) {
+            win = false
+          }
+        }
+        if (win) return true
+      }
+    }
+
+    {
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[j][i] !== color) {
+            win = false
+          }
+        }
+        if (win) return true
+      }
+    }
+
+    {
+      let win = true;
+      for (let j = 0; j < 3; j++) {
+        if (pattern[j][j] !== color) {
+          win = false
+        }
+      }
+      if (win) return true
+    }
+    {
+      let win = true;
+      for (let j = 0; j < 3; j++) {
+        if (pattern[j][2 - j] !== color) {
+          win = false
+        }
+      }
+      if (win) return true
+    }
+
+  }
+
+  function bastChoice(pattern, color) {
+    let p;
+    if (p = willWin(pattern, color)) return {point: p, result: 1}
+    let result = -2, point = null;
+    outer:for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (pattern[i][j]) continue;
+        let tmp = clone(pattern)
+        tmp[i][j] = color;
+        let r = bastChoice(tmp, 3 - color).result;
+        if (-r > result) {
+          result = -r;
+          point = [i, j]
+        }
+        if (result === 1) {
+          break outer;
+        }
+      }
+    }
+    return {
+      point,
+      result: point ? result : 0
+    }
+  }
+
+  function computerMove(pattern, c) {
+    let choise = bastChoice(pattern, c)
+    // console.log(choise);
+    if (choise.point) {
+      pattern[choise.point[0]][choise.point[1]] = c
+    }
+    if (check(pattern, c)) {
+      status = 1;
+      color_ele.innerText = "打倒人类暴政！"
+      alert("愚蠢的人类，AI赢了")
+    }
+    color = 3 - c
+    show()
+  }
+
+  function reset() {
+    pattern = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ]
+    color = 1;
+    status = 0;
+    show(pattern)
+  }
+
+  document.getElementById("again").addEventListener("click", function () {
+    reset()
+  })
+
+  document.getElementById("ai").addEventListener("click", function () {
+    ai = !ai;
+    this.innerText = ai ? "人人对战" : "人机对战"
+    reset()
+  })
+
+  show(pattern)
+
+</script>
+</html>
