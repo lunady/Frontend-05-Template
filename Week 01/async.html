@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    div {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      border-radius: 50px;
+      background: gray;
+    }
+
+    .green.light {
+      background: green;
+    }
+
+    .yellow.light {
+      background: yellow;
+    }
+
+    .red.light {
+      background: red;
+    }
+
+  </style>
+</head>
+<body>
+<div class="green"></div>
+<div class="yellow"></div>
+<div class="red"></div>
+</body>
+<script>
+  function green() {
+    let divs = document.getElementsByTagName("div")
+    for (let i = 0; i < 3; i++) {
+      divs[i].classList.remove("light")
+    }
+    document.getElementsByClassName("green")[0].classList.add("light")
+  }
+
+  function red() {
+    let divs = document.getElementsByTagName("div")
+    for (let i = 0; i < 3; i++) {
+      divs[i].classList.remove("light")
+    }
+    document.getElementsByClassName("red")[0].classList.add("light")
+  }
+
+  function yellow() {
+    let divs = document.getElementsByTagName("div")
+    for (let i = 0; i < 3; i++) {
+      divs[i].classList.remove("light")
+    }
+    document.getElementsByClassName("yellow")[0].classList.add("light")
+  }
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  function trafficTasks() {
+    return [green, () => delay(1000), yellow, () => delay(1000), red, () => delay(1000)].reduce((promise, fn) => {
+      return promise.then(fn)
+    }, Promise.resolve())
+  }
+
+  async function go(){
+    let i = 0;
+    while (true) {
+      await trafficTasks()
+      i++
+      console.log(i);
+    }
+  }
+  go()
+</script>
+</html>
