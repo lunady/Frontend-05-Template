@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>聪明工程师大战人工智障</title>
+  <link href="./style.css" rel="stylesheet">
+</head>
+<body>
+<div class="gamer">
+  <div id="board"></div>
+  <p id="tips"></p>
+</div>
+</body>
+<script src="gobang.js"></script>
+<script>
+  class SmartAiGobang extends Gobang {
+    // 棋局的评估分数 0=空 1=有棋子
+    SHAPE_SCORE = {
+      "0_1_1_0_0": 50,
+      "0_0_1_1_0": 50,
+      "1_1_0_1_0": 200,
+      "0_0_1_1_1": 500,
+      "1_1_1_0_0": 500,
+      "0_1_1_1_0": 5000,
+      "0_1_0_1_1_0": 5000,
+      "0_1_1_0_1_0": 5000,
+      "1_1_1_0_1": 5000,
+      "1_1_0_1_1": 5000,
+      "1_0_1_1_1": 5000,
+      "1_1_1_1_0": 5000,
+      "0_1_1_1_1": 5000,
+      "0_1_1_1_1_0": 50000,
+      "1_1_1_1_1": 99999999
+    };
+
+    constructor() {
+      super();
+      this.ratio = 10; // 进攻的系数  大于1 进攻型, 小于1 防守型
+      this.depth = 3; // 搜索深度
+      this.ai_point = []; // ai要下的地方
+    }
+
+    init() {
+      // 初始化棋盘
+      // 以下所有纵轴记为为【i】，横轴为【j】
+      let _this = this;
+      let board_ele = document.getElementById("board");
+      board_ele.innerText = ""
+      let oFragment = document.createDocumentFragment();
+      for (let i = 0; i < 15; i++) {
+        for (let j = 0; j < 15; j++) {
+          this.pattern.push(0)
+          let cell = document.createElement("div");
+          cell.id = `${i}_${j}`;
+          oFragment.append(cell)
+        }
+      }
+      board_ele.appendChild(oFragment);
+      board_ele.addEventListener("click", function (e) {
+        if (!_this.gameOver) {
+          let [i, j] = e.target.id.split("_")
+          console.log('click--', i, j);
+          _this.move(Number(i), Number(j), e.target)
+        }
+
+
+        // let [i, j] = e.target.id.split("_")
+        // console.log('click--', i, j);
+        // _this.move(Number(i), Number(j), e.target)
+
+
+      })
+    }
+
+    move(i, j, target) {
+      let cellStatus = this.getCellStatus(i, j)
+      if (cellStatus !== 0) {
+        this.setTips("醒醒！这里有棋子了！")
+        return;
+      }
+      this.setCellStatus(i, j, this.color)
+      let cell = document.createElement("div");
+      cell.className = this.color === 1 ? `black` : this.color === 2 ? `white` : ``
+      if (target) {
+        target.append(cell)
+      } else {
+        document.getElementById(`${i}_${j}`).append(cell)
+      }
+      // this.evaluation(this.color === 2)
+
+      // 检查是否结束
+      if (this.check(i, j, this.color)) {
+        this.gameOver = true
+        alert(`结束：${this.color === 1 ? "黑子" : "白子"}获胜！`)
+        this.setTips(`结束：${this.color === 1 ? "你赢了！" : "人工智能统治世界！"}`)
+      } else {
+        this.exchangeColor()
+        // AI下棋
+        if (this.color === 2) {
+          let res = this.negamax(this.pattern, this.depth, this.color, -Infinity, Infinity)
+          console.log('结果', res, this.ai_point);
+          this.move(...this.ai_point)
+        }
+      }
+    }
+
+    /**
+     * 获取棋盘上可走的位置范围
+     * 没必要全量搜索, 仅选取棋盘已落子点两步集合范围内
+     * TODO: 优化排序
+     */
+    getAvailableCells() {
+      let stack = [].concat(this.list1).concat(this.list2)
+      let cellLength = stack.length;
+      let availableCells = [];
+      if (cellLength === 1) {
+        // 对手就落了一个子，那就在棋盘中央(7,7)周围随机下一个
+        return [[7 + (Math.random() < 0.5 ? -1 : 1), 7 + (Math.random() < 0.5 ? -1 : 1)]];
+        // return [[7, 7]];
+      } else {
+        // 遍历查找已有棋子周边空白区域
+        let hash = {};
+        stack.forEach(function (p) {
+          let nearPoints = this.getNearPoints(p);
+          nearPoints.forEach(function (point) {
+            let i = point[0], j = point[1];
+            if (!hash[i + '_' + j]) {
+              availableCells.push(point);
+              hash[i + '_' + j] = true;
+            }
+          });
+        }.bind(this));
+        return availableCells;
+      }
+      return availableCells
+    }
+
+    /**
+     * 获取围绕点p 考虑落子的区域
+     * 这里选取周围 横竖斜 2步 区域内的空点
+     */
+    getNearPoints(p, pattern, gap = 2) {
+      let [i, j] = p;
+      let emptyCells = []
+      for (let n = -gap; n <= gap; n++) {
+        if (n === 0) continue;
+        if (this.getCellStatus(i + n, j, pattern) === 0) {
+          emptyCells.push([i + n, j])
+        }
+        if (this.getCellStatus(i, j + n, pattern) === 0) {
+          emptyCells.push([i, j + n])
+        }
+        if (this.getCellStatus(i + n, j + n, pattern) === 0) {
+          emptyCells.push([i + n, j + n])
+        }
+        if (this.getCellStatus(i - n, j + n, pattern) === 0) {
+          emptyCells.push([i - n, j + n])
+        }
+      }
+      return emptyCells;
+    }
+
+    /**
+     *  当前棋面评估函数
+     *  这里使用简单评估方案
+     *
+     */
+    evaluation(is_ai, pattern) {
+      // debugger;
+      let my_list = is_ai ? this.list2 : this.list1,
+        enemy_list = is_ai ? this.list1 : this.list2;
+      // console.log("my_list", my_list);
+      // console.log("enemy_list", enemy_list);
+      // 算自己的得分
+      let score_all_arr = [],  // 得分形状的位置 用于计算如果有相交 得分翻倍
+        my_score = 0;
+      for (let cell of my_list) {
+        my_score += this.cal_score(cell[0], cell[1], 0, 1, pattern, is_ai, score_all_arr); // 横
+        my_score += this.cal_score(cell[0], cell[1], 1, 0, pattern, is_ai, score_all_arr); // 纵
+        my_score += this.cal_score(cell[0], cell[1], 1, 1, pattern, is_ai, score_all_arr);
+        my_score += this.cal_score(cell[0], cell[1], -1, 1, pattern, is_ai, score_all_arr);
+      }
+      // console.log('my_score=====', my_score);
+      // 算敌人得分
+      let score_all_arr_enemy = [],
+        enemy_score = 0;
+      for (let cell of enemy_list) {
+        enemy_score += this.cal_score(cell[0], cell[1], 0, 1, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.cal_score(cell[0], cell[1], 1, 0, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.cal_score(cell[0], cell[1], 1, 1, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.cal_score(cell[0], cell[1], -1, 1, pattern, !is_ai, score_all_arr_enemy);
+      }
+      // console.log(is_ai, 'my_score=====', my_score, 'enemy_score=====', enemy_score);
+      // 当前局势的总分数 = 自己分数 - 对手分数 * 进攻系数
+      // console.log(is_ai,"evaluation: ", my_score , enemy_score, my_score - enemy_score * this.ratio * 0.1);
+      return my_score - enemy_score * this.ratio * 0.1
+    }
+
+    // 每个方向上的分值计算
+    cal_score(i, j, x_decrict, y_derice, pattern, is_ai, score_all_arr) {
+      // debugger;
+      // console.log(i, j);
+      let add_score = 0;
+      // 在一个方向上 只取最大的得分项
+      let max_score_shape = {
+        score: 0,
+        shape: null
+      };
+
+      // 如果此方向上，该点已经有得分形状，不重复计算
+      for (let item of score_all_arr) {
+        // console.log('item', item);
+        // console.log(i, j);
+        for (let shape of item.shape) {
+          // console.log(shape);
+          if (i === shape[0] && j === shape[1] && x_decrict === item.decrict[0] && y_derice === item.decrict[1]) {
+            // 此方向上已计算
+            // console.log("此方向上已计算");
+            return 0;
+          }
+        }
+      }
+
+      // 在落子点 左右方向上循环查找得分形状
+      for (let offset = -5; offset < 1; offset++) {
+        let pos = [];
+        let hasRealP = true; // 这个点是否在棋盘范围内
+        for (let n = 0; n < 6; n++) {
+          let p = this.getCellStatus(i + (n + offset) * x_decrict, j + (n + offset) * y_derice, pattern)
+          // console.warn('p =', p, "坐标->", i + (n + offset) * x_decrict, j + (n + offset) * y_derice);
+          // 过滤不存在的点
+          if (p == null) {
+            // debugger;
+            hasRealP = false;
+            // console.log('不存在');
+            break;
+          }
+
+          if (is_ai) {
+            pos.push(p === 2 ? 1 : p === 1 ? 2 : 0)
+          } else {
+            pos.push(p === 2 ? 2 : p === 1 ? 1 : 0)
+          }
+        }
+        if (!hasRealP) continue;
+
+        // console.log(`（${i},${j}）`, offset, pos);
+        let tmp_shap5 = [pos[0], pos[1], pos[2], pos[3], pos[4]].join("_");
+        let tmp_shap6 = [pos[0], pos[1], pos[2], pos[3], pos[4], pos[5]].join("_");
+
+        if (this.SHAPE_SCORE[tmp_shap5] || this.SHAPE_SCORE[tmp_shap6]) {
+          let score_5 = this.SHAPE_SCORE[tmp_shap5] || 0;
+          let score_6 = this.SHAPE_SCORE[tmp_shap6] || 0;
+          let score = score_6 > score_5 ? score_6 : score_5;
+          // console.log("中了", score);
+
+          if (tmp_shap5 === "1_1_1_1_1") {
+            console.log("wwwwwww");
+          }
+          if (score > max_score_shape.score) {
+            max_score_shape.score = score;
+            max_score_shape.shape = [
+              [i + (0 + offset) * x_decrict, j + (0 + offset) * y_derice],
+              [i + (1 + offset) * x_decrict, j + (1 + offset) * y_derice],
+              [i + (2 + offset) * x_decrict, j + (2 + offset) * y_derice],
+              [i + (3 + offset) * x_decrict, j + (3 + offset) * y_derice],
+              [i + (4 + offset) * x_decrict, j + (4 + offset) * y_derice]
+            ]
+            max_score_shape.decrict = [x_decrict, y_derice] //将方向保存
+          }
+        }
+      }
+
+      if (max_score_shape.shape) score_all_arr.push(max_score_shape);
+      // console.error(max_score_shape);
+      // console.error(add_score + max_score_shape.score);
+      return add_score + max_score_shape.score
+    }
+
+
+    has_neightnor(p, pattern, gap = 1) {
+      let [i, j] = p;
+      for (let n = -gap; n <= gap; n++) {
+        if (n === 0) continue;
+        if (
+          [1, 2].includes(this.getCellStatus(i + n, j, pattern)) ||
+          [1, 2].includes(this.getCellStatus(i, j + n, pattern)) ||
+          [1, 2].includes(this.getCellStatus(i + n, j + n, pattern)) ||
+          [1, 2].includes(this.getCellStatus(i - n, j + n, pattern))
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * 极大极小值搜索
+     *  αβ剪枝
+     */
+    negamax(pattern, depth, role, alpha, beta) {
+      // debugger;
+      if (depth <= 0) {
+        let a = this.evaluation(role === 2, pattern);
+        // console.log("到底了role", role);
+        return a;
+      } else {
+        let steps = this.getAvailableCells();
+        console.log(depth, '搜索MAX' + steps.length + '个棋局');
+        if (steps.length) {
+          for (let n = 0, l = steps.length; n < l; n++) {
+            let [i, j] = steps[n];
+            let newPattern = pattern.slice();
+            // 如果要评估的位置没有相邻的子，则不去评估
+            if (!this.has_neightnor([i, j]) && l !== 1) {
+              continue;
+            }
+            // 判断这步是否赢了
+            if (this.check(i, j, this.color, newPattern)) {
+              // this.setCellStatus(i, j, this.color)
+              console.error("结束!!")
+              this.ai_point = [i, j];
+              return;
+            } else {
+              // 没赢
+              // console.log('newPattern',newPattern);
+              this.setCellStatus(i, j, this.color, newPattern)
+
+              let res = this.negamax(newPattern, depth - 1, 3 - role, -beta, -alpha);
+              res *= -1; //  负极大值实现
+              this.removeCell(i, j, newPattern)
+
+              // if (depth === 3) {
+                // console.warn(i, j, "res： ", res, "alpha： ", alpha, "beta： ", beta);
+              // }
+
+              if (res > alpha) {
+
+                // console.warn([i, j],"res： ",res, "alpha： ",alpha, "beta： ",beta);
+                if (depth === this.depth) {
+                  // console.error(depth, " 放入", [i, j]);
+                  this.ai_point = [i, j]
+                }
+                if (res >= beta) {
+                  // console.log('剪掉', beta);
+                  return beta
+                }
+                alpha = res
+                // console.log(depth, " alpha选择最大优势的走法", alpha);
+              }
+
+            }
+          }
+        }
+        return alpha
+      }
+    }
+  }
+
+  let newGame = new SmartAiGobang()
+  newGame.init()
+
+</script>
+</html>
