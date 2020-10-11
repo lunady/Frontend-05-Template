@@ -69,6 +69,8 @@ ID3算法：
 
 #### 参考资料
 [lihongxun945 五子棋AI教程第二版](https://github.com/lihongxun945/myblog/issues/11)
+
 [gobang_AI](https://github.com/colingogogo/gobang_AI)
+
 [jiaxin96 Projects](https://github.com/jiaxin96/Projects/tree/93c06c5cec3ff392e3289ddbd96e620d64b8426d/%E4%BA%94%E5%AD%90%E6%A3%8BAI/alphabeta-master)
 
