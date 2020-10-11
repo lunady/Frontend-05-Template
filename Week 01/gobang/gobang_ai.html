@@ -35,9 +35,9 @@
 
     constructor() {
       super();
-      this.ratio = 10; // 进攻的系数  大于1 进攻型, 小于1 防守型
-      this.depth = 3; // 搜索深度
-      this.ai_point = []; // ai要下的地方
+      this.ratio = 1; // 进攻的系数  大于1 进攻型, 小于1 防守型
+      this.depth = 1; // 搜索深度
+      this.ai_point = []; // ai将要落子的的位置
     }
 
     init() {
@@ -62,13 +62,6 @@
           console.log('click--', i, j);
           _this.move(Number(i), Number(j), e.target)
         }
-
-
-        // let [i, j] = e.target.id.split("_")
-        // console.log('click--', i, j);
-        // _this.move(Number(i), Number(j), e.target)
-
-
       })
     }
 
@@ -86,7 +79,6 @@
       } else {
         document.getElementById(`${i}_${j}`).append(cell)
       }
-      // this.evaluation(this.color === 2)
 
       // 检查是否结束
       if (this.check(i, j, this.color)) {
@@ -163,41 +155,39 @@
     /**
      *  当前棋面评估函数
      *  这里使用简单评估方案
-     *
+     *  四个方向构成SHAPE_SCORE中的局面的数量
      */
     evaluation(is_ai, pattern) {
       // debugger;
       let my_list = is_ai ? this.list2 : this.list1,
         enemy_list = is_ai ? this.list1 : this.list2;
-      // console.log("my_list", my_list);
-      // console.log("enemy_list", enemy_list);
-      // 算自己的得分
+      // 计算自己的得分
       let score_all_arr = [],  // 得分形状的位置 用于计算如果有相交 得分翻倍
         my_score = 0;
       for (let cell of my_list) {
-        my_score += this.cal_score(cell[0], cell[1], 0, 1, pattern, is_ai, score_all_arr); // 横
-        my_score += this.cal_score(cell[0], cell[1], 1, 0, pattern, is_ai, score_all_arr); // 纵
-        my_score += this.cal_score(cell[0], cell[1], 1, 1, pattern, is_ai, score_all_arr);
-        my_score += this.cal_score(cell[0], cell[1], -1, 1, pattern, is_ai, score_all_arr);
+        my_score += this.calScore(cell[0], cell[1], 0, 1, pattern, is_ai, score_all_arr); // 横
+        my_score += this.calScore(cell[0], cell[1], 1, 0, pattern, is_ai, score_all_arr); // 纵
+        my_score += this.calScore(cell[0], cell[1], 1, 1, pattern, is_ai, score_all_arr);
+        my_score += this.calScore(cell[0], cell[1], -1, 1, pattern, is_ai, score_all_arr);
       }
-      // console.log('my_score=====', my_score);
-      // 算敌人得分
+
+      // 敌人得分
       let score_all_arr_enemy = [],
         enemy_score = 0;
       for (let cell of enemy_list) {
-        enemy_score += this.cal_score(cell[0], cell[1], 0, 1, pattern, !is_ai, score_all_arr_enemy);
-        enemy_score += this.cal_score(cell[0], cell[1], 1, 0, pattern, !is_ai, score_all_arr_enemy);
-        enemy_score += this.cal_score(cell[0], cell[1], 1, 1, pattern, !is_ai, score_all_arr_enemy);
-        enemy_score += this.cal_score(cell[0], cell[1], -1, 1, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.calScore(cell[0], cell[1], 0, 1, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.calScore(cell[0], cell[1], 1, 0, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.calScore(cell[0], cell[1], 1, 1, pattern, !is_ai, score_all_arr_enemy);
+        enemy_score += this.calScore(cell[0], cell[1], -1, 1, pattern, !is_ai, score_all_arr_enemy);
       }
-      // console.log(is_ai, 'my_score=====', my_score, 'enemy_score=====', enemy_score);
+
       // 当前局势的总分数 = 自己分数 - 对手分数 * 进攻系数
       // console.log(is_ai,"evaluation: ", my_score , enemy_score, my_score - enemy_score * this.ratio * 0.1);
       return my_score - enemy_score * this.ratio * 0.1
     }
 
     // 每个方向上的分值计算
-    cal_score(i, j, x_decrict, y_derice, pattern, is_ai, score_all_arr) {
+    calScore(i, j, x_decrict, y_derice, pattern, is_ai, score_all_arr) {
       // debugger;
       // console.log(i, j);
       let add_score = 0;
@@ -278,7 +268,7 @@
     }
 
 
-    has_neightnor(p, pattern, gap = 1) {
+    hasNeightnor(p, pattern, gap = 1) {
       let [i, j] = p;
       for (let n = -gap; n <= gap; n++) {
         if (n === 0) continue;
@@ -312,7 +302,7 @@
             let [i, j] = steps[n];
             let newPattern = pattern.slice();
             // 如果要评估的位置没有相邻的子，则不去评估
-            if (!this.has_neightnor([i, j]) && l !== 1) {
+            if (!this.hasNeightnor([i, j]) && l !== 1) {
               continue;
             }
             // 判断这步是否赢了
@@ -323,16 +313,11 @@
               return;
             } else {
               // 没赢
-              // console.log('newPattern',newPattern);
               this.setCellStatus(i, j, this.color, newPattern)
 
               let res = this.negamax(newPattern, depth - 1, 3 - role, -beta, -alpha);
               res *= -1; //  负极大值实现
               this.removeCell(i, j, newPattern)
-
-              // if (depth === 3) {
-                // console.warn(i, j, "res： ", res, "alpha： ", alpha, "beta： ", beta);
-              // }
 
               if (res > alpha) {
 
