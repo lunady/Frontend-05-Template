@@ -1,7 +1,7 @@
 ## HASH树 && 字典树
 
-(详解HashTree哈希树)[https://blog.csdn.net/yang_yulei/article/details/46337405]  
-(Trie树:应用于统计和排序)[http://blog.csdn.net/hguisu/article/details/8131559]
+[详解HashTree哈希树](https://blog.csdn.net/yang_yulei/article/details/46337405)  
+[Trie树:应用于统计和排序](http://blog.csdn.net/hguisu/article/details/8131559)
 
 #### HASH树
 【质数分辨定理】  
@@ -19,7 +19,7 @@ Trie树，又称单词查找树或键树，是一种树形结构，是一种**�
 Trie的核心思想是**空间换时间**。利用字符串的**公共前缀**来降低查询时间的开销以达到提高效率的目的。  
 
 ## KMP算法
-(KMP)[https://www.cnblogs.com/zhangtianq/p/5839909.html]
+[KMP](https://www.cnblogs.com/zhangtianq/p/5839909.html)  
 KMP算法的核心，是一个被称为部分匹配表(Partial Match Table)的数组  
 对于字符串“abababca”，它的PMT如下表所示：
 <img src="https://pic1.zhimg.com/50/v2-e905ece7e7d8be90afc62fe9595a9b0f_hd.jpg?source=1940ef5c" data-caption="" data-size="normal" data-rawwidth="796" data-rawheight="299" class="origin_image zh-lightbox-thumb" width="796" data-original="https://pic3.zhimg.com/v2-e905ece7e7d8be90afc62fe9595a9b0f_r.jpg?source=1940ef5c"/>
@@ -30,3 +30,5 @@ KMP算法的核心，是一个被称为部分匹配表(Partial Match Table)的�
 
 ## Wildcard Matching
 
+
+[使用通配符*,?等来查找字符串](https://blog.csdn.net/m0_37609579/article/details/100026156)
