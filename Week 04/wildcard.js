@@ -32,15 +32,14 @@ function find(source, pattern) {
       subPattern += pattern[i];
       i++;
     }
-    console.log("i--",i);
-    console.log(subPattern);
     let reg = new RegExp(subPattern.replace(/\?/g, "[\\s\\S]"), "g");
     reg.lastIndex = lastIndex;
-    console.log(reg.exec(source));
+    if(!reg.exec(source))
+      return false;
     lastIndex = reg.lastIndex;
   }
 
-  console.warn(lastIndex);
+
   // 匹配尾部
   for (let j = 0; j <= source.length - lastIndex && pattern[pattern.length - j] !== "*"; j++) {
     if (pattern[pattern.length - j] !== source[source.length - j] && pattern[pattern.length - 1] !== "?") {
