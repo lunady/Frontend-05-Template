@@ -19,6 +19,7 @@ Trie树，又称单词查找树或键树，是一种树形结构，是一种**�
 Trie的核心思想是**空间换时间**。利用字符串的**公共前缀**来降低查询时间的开销以达到提高效率的目的。  
 
 ## KMP算法
+[leetcode](https://leetcode-cn.com/problems/implement-strstr/solution/bang-ni-ba-kmpsuan-fa-xue-ge-tong-tou-ming-ming-ba/)
 [KMP](https://www.cnblogs.com/zhangtianq/p/5839909.html)  
 KMP算法的核心，是一个被称为部分匹配表(Partial Match Table)的数组  
 对于字符串“abababca”，它的PMT如下表所示：
