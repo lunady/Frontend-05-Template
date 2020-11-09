@@ -60,6 +60,7 @@ double a=0.8125
 ...
 ```
 可以发现有限十进制小数 0.1 却转化成了无限二进制小数 0.00011001100...，可以看到精度在转化过程中丢失了！   
+
 能被转化为有限二进制小数的十进制小数的最后一位必然以 5 结尾(因为只有 0.5 * 2 才能变为整数)。所以十进制中一位小数 0.1 ~ 0.9 当中除了 0.5 之外的值在转化成二进制的过程中都丢失了精度。  
 
 0.1以Double在内存中存储：  
@@ -77,9 +78,10 @@ Math.pow(2, 53) === Math.pow(2, 53) + 1 // true
 最大的安全数为 Math.pow(2, 53) - 1，即 9007199254740991。  
 
 
-参考资料  
+参考资料   
 [IEEE754标准 单精度(32位)/双精度(64位)浮点数解码](https://blog.csdn.net/qq_42802219/article/details/96972346)  
 [JavaScript 十进制小数转为二进制精度问题及解决方案](http://www.cainiaoxueyuan.com/gcs/6802.html)  
 [JavaScript 浮点数陷阱及解法](https://github.com/camsong/blog/issues/9)  
 [What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)  
+
 ---
