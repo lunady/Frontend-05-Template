@@ -78,7 +78,7 @@ Math.pow(2, 53) === Math.pow(2, 53) + 1 // true
 最大的安全数为 Math.pow(2, 53) - 1，即 9007199254740991。  
 
 
-参考资料    
+【参考资料】   
 
 [IEEE754标准 单精度(32位)/双精度(64位)浮点数解码](https://blog.csdn.net/qq_42802219/article/details/96972346)  
 [JavaScript 十进制小数转为二进制精度问题及解决方案](http://www.cainiaoxueyuan.com/gcs/6802.html)  
@@ -201,7 +201,7 @@ function UTF8_Encoding(string) {
 访问器属性不能直接定义，要通过Object.defineProperty()这个方法来定义。
 
 
-#### special object
+### special object
 
 双方括号[[]] 代表对象内置行为，在JavaScript无论使用任何方式都无法访问，在调用js引擎的C++/C中可以调用
 
