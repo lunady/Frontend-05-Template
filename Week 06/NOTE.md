@@ -78,11 +78,14 @@ Math.pow(2, 53) === Math.pow(2, 53) + 1 // true
 最大的安全数为 Math.pow(2, 53) - 1，即 9007199254740991。  
 
 
-参考资料  
+参考资料    
+
 [IEEE754标准 单精度(32位)/双精度(64位)浮点数解码](https://blog.csdn.net/qq_42802219/article/details/96972346)  
 [JavaScript 十进制小数转为二进制精度问题及解决方案](http://www.cainiaoxueyuan.com/gcs/6802.html)  
 [JavaScript 浮点数陷阱及解法](https://github.com/camsong/blog/issues/9)  
-[What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)  
+[What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html) 
+
+
 ---
 
 ## String
@@ -210,4 +213,5 @@ Host Object: JavaScript语言提供的任何依赖于宿主环境的对象，所
 
 
 [JavaScript 标准内置对象](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects)
+
 ---
