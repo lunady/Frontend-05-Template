@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realm</title>
+</head>
+<body>
+<div id="box"></div>
+</body>
+<script src="https://gw.alipayobjects.com/os/lib/antv/g6/3.8.5/dist/g6.min.js"></script>
+<script>
+  const getRealmObj = () => {
+    let map = new Map();
+    let set = new Set();
+    const objects = [
+      "Infinity",
+      "NaN",
+      "eval",
+      "isFinite",
+      "isNaN",
+      "parseFloat",
+      "parseInt",
+      "decodeURI",
+      "Object",
+      "Function",
+      "Boolean",
+      "Symbol",
+      "Error",
+      "AggregateError",
+      "EvalError",
+      "RangeError",
+      "Number",
+      "BigInt",
+      "Math",
+      "Date",
+      "String",
+      "RegExp",
+      "Array",
+      "Int8Array",
+      "Uint8Array",
+      "Uint8ClampedArray",
+      "Int16Array",
+      "Uint16Array",
+      "Int32Array",
+      "Uint32Array",
+      "Float32Array",
+      "Float64Array",
+      "BigInt64Array",
+      "BigUint64Array",
+      "Map",
+      "Set",
+      "WeakMap",
+      "WeakSet",
+      "ArrayBuffer",
+      "SharedArrayBuffer",
+      "Atomics",
+      "DataView",
+      "JSON",
+      "Promise",
+      "Reflect",
+      "Proxy",
+      "WebAssembly",
+      "decodeURIComponent",
+      "encodeURI",
+      "encodeURIComponent",
+      "ReferenceError",
+      "SyntaxError",
+      "TypeError",
+      "URIError",
+    ];
+    objects.forEach((o) => {
+      map.set(o, window[o]);
+    });
+    const initData = {
+      id: "box",
+      children: [],
+    };
+    for (let i = 0; i < objects.length; i++) {
+      const key = objects[i];
+      const o = window[key];
+      let child = { id: key, children: [] };
+      for (let k of Object.getOwnPropertyNames(o)) {
+        const d = Object.getOwnPropertyDescriptor(o, k);
+        if (
+          (d.value !== null && typeof d.value === "object") ||
+          typeof d.value === "function"
+        ) {
+          child.children.push({ id: `${key}-${k}`, label: k });
+        }
+      }
+      initData.children.push(child);
+    }
+    return initData;
+  };
+  const render = (initData) => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const graph = new G6.TreeGraph({
+      container: "box",
+      width: width,
+      height: height,
+      modes: {
+        default: [
+          {
+            type: "collapse-expand",
+            onChange: function onChange(item, collapsed) {
+              const data = item.get("model").data;
+              data.collapsed = collapsed;
+              return true;
+            },
+          },
+          "drag-canvas",
+          "zoom-canvas",
+        ],
+      },
+      defaultNode: {
+        size: 26,
+        anchorPoints: [
+          [0, 0.5],
+          [1, 0.5],
+        ],
+      },
+      defaultEdge: {
+        type: "cubic-horizontal",
+      },
+      layout: {
+        type: "mindmap",
+        getHeight: () => {
+          return 16;
+        },
+        getWidth: () => {
+          return 16;
+        },
+        getVGap: () => {
+          return 10;
+        },
+        getHGap: () => {
+          return 100;
+        },
+        getSide: () => {
+          return "right";
+        },
+      },
+    });
+    let centerX = 0;
+    graph.node(function (node) {
+      if (node.id === "Modeling Methods") {
+        centerX = node.x;
+      }
+
+      return {
+        label: node.label || node.id,
+        labelCfg: {
+          position:
+            node.children && node.children.length > 0
+              ? "right"
+              : node.x > centerX
+              ? "right"
+              : "left",
+          offset: 5,
+        },
+      };
+    });
+    graph.data(initData);
+    graph.render();
+    graph.fitView();
+  };
+  render(getRealmObj());
+</script>
+</html>
