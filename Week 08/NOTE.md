@@ -7,8 +7,8 @@ Transfer-Encoding: chunked 表示输出的内容长度不能确定
 数据以一系列分块的形式进行发送。 Content-Length 首部在这种情况下不被发送。在每一个分块的开头需要添加当前分块的长度，以十六进制的形式表示，后面紧跟着 '\r\n' ，之后是分块本身，后面也是'\r\n' 。终止块是一个常规的分块，不同之处在于其长度为0。终止块后面是一个挂载（trailer），由一系列（或者为空）的实体消息首部构成。
 
 
-待补充
-【参考资料】
+待补充  
+【参考资料】  
 [tokenization](https://html.spec.whatwg.org/multipage/parsing.html#tokenization)  
 [Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding)  
 [HTTP 协议中的 Transfer-Encoding](https://blog.csdn.net/u014569188/article/details/78912469)  
