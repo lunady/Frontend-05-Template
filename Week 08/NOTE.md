@@ -10,5 +10,7 @@ Transfer-Encoding: chunked 表示输出的内容长度不能确定
 待补充
 【参考资料】
 [tokenization](https://html.spec.whatwg.org/multipage/parsing.html#tokenization)  
-[Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding)
-[HTTP 协议中的 Transfer-Encoding](https://blog.csdn.net/u014569188/article/details/78912469)
+[Transfer-Encoding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding)  
+[HTTP 协议中的 Transfer-Encoding](https://blog.csdn.net/u014569188/article/details/78912469)  
+
+[从有限状态机的角度去理解KMP](https://www.cnblogs.com/courtier/p/4273193.html)
