@@ -1,0 +1,129 @@
+<style>
+    body {
+     background-color: palevioletred;
+    }
+    span {
+        font-size: 30px;
+    }
+    .sp {
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+    <div style="background-color: aqua">
+        <span style="color: aqua" class="sp">12345</span>
+    </div>
+    <img src="123" alt="123" />
+</body>
+
+===================================
+
+
+{
+    "type": "stylesheet",
+    "stylesheet": {
+        "rules": [
+            {
+                "type": "rule",
+                "selectors": [
+                    "body"
+                ],
+                "declarations": [
+                    {
+                        "type": "declaration",
+                        "property": "background-color",
+                        "value": "palevioletred",
+                        "position": {
+                            "start": {
+                                "line": 3,
+                                "column": 2
+                            },
+                            "end": {
+                                "line": 3,
+                                "column": 33
+                            }
+                        }
+                    }
+                ],
+                "position": {
+                    "start": {
+                        "line": 2,
+                        "column": 1
+                    },
+                    "end": {
+                        "line": 4,
+                        "column": 2
+                    }
+                }
+            },
+            {
+                "type": "rule",
+                "selectors": [
+                    "span"
+                ],
+                "declarations": [
+                    {
+                        "type": "declaration",
+                        "property": "font-size",
+                        "value": "30px",
+                        "position": {
+                            "start": {
+                                "line": 6,
+                                "column": 5
+                            },
+                            "end": {
+                                "line": 6,
+                                "column": 20
+                            }
+                        }
+                    }
+                ],
+                "position": {
+                    "start": {
+                        "line": 5,
+                        "column": 1
+                    },
+                    "end": {
+                        "line": 7,
+                        "column": 2
+                    }
+                }
+            },
+            {
+                "type": "rule",
+                "selectors": [
+                    ".sp"
+                ],
+                "declarations": [
+                    {
+                        "type": "declaration",
+                        "property": "margin-bottom",
+                        "value": "20px",
+                        "position": {
+                            "start": {
+                                "line": 9,
+                                "column": 5
+                            },
+                            "end": {
+                                "line": 9,
+                                "column": 24
+                            }
+                        }
+                    }
+                ],
+                "position": {
+                    "start": {
+                        "line": 8,
+                        "column": 1
+                    },
+                    "end": {
+                        "line": 10,
+                        "column": 2
+                    }
+                }
+            }
+        ],
+        "parsingErrors": []
+    }
+}
